@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화면을 채우는 만다라</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="mandalaCanvas"></canvas>
+    <script>
+        // 캔버스 설정
+        const canvas = document.getElementById('mandalaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 캔버스 크기 동적으로 설정
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 중심 좌표 및 만다라 특성 정의
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const numPetals = 16; // 대칭 갯수
+        let baseRadius = 0; // 초기 반지름 (0으로 시작)
+        const maxRadius = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / 2; // 화면 대각선 길이의 절반
+        const growthRate = 3; // 반지름 증가 속도
+
+        let rotationAngle = 0; // 회전 각도
+
+        // 만다라 패턴 그리기 함수
+        function drawMandala(radius) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < numPetals; i++) {
+                const angle = (Math.PI * 2 / numPetals) * i;
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + rotationAngle);
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, radius / 2);
+                ctx.arc(0, radius / 2, radius / 6, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${(i * 360) / numPetals + rotationAngle * 100}, 80%, 60%)`;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // 애니메이션 루프
+        function animate() {
+            rotationAngle += 0.01; // 회전 속도
+
+            if (baseRadius < maxRadius) {
+                baseRadius += growthRate; // 반지름 증가
+            }
+
+            drawMandala(baseRadius);
+            requestAnimationFrame(animate);
+        }
+
+        // 초기화 및 실행
+        animate();
+    </script>
+</body>
+</html>
